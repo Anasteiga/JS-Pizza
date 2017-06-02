@@ -1,3 +1,71 @@
-@mainColor: blue;
+@mainColor:  #f0ad4e;
 
+@import "header";
 @import "pizza/pizza-card";
+@import "cart";
+
+body {
+    background-color: #fffff5;
+}
+
+#discount {
+    position: fixed;
+    width: 80px;
+    height: 100px;
+    background-color: #ea862e;
+    color: white;
+    padding: 5px;
+    left:10px;
+    bottom: 0px;
+    text-align: center;
+    font-size: 14px;
+    //padding-top: 8px;
+    font-weight: bold;
+    img {
+        position: absolute;
+        bottom: 100px;
+        left: 0px;
+        width: 80px;
+    }
+    p {
+      margin-top: 10px;  
+    }
+}
+
+h1, h2, h3, h4, h5, h6, a {
+    color: #f0ad4e;
+}
+
+.container {
+    min-width: 500px;
+    h2 {
+        color: black;
+    }
+}
+
+.quantity {
+    color: white;
+    display: inline-block;
+    background-color: #f0ad4e;
+    width: 25px;
+    height: 25px;
+    padding: 3px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 16px;
+}
+
+a:hover, a.active {
+    color: white;
+    background-color: @mainColor;
+    text-decoration: none;
+    border-radius: 7px;
+}
+
+#main-footer {
+    box-shadow: 0px -7px 27px -12px rgba(0,0,0,0.63);
+    height: 90px;
+    width: 100%;
+    padding: 30px;
+    background-color: white;
+}

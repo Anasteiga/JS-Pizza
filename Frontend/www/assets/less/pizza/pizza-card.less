@@ -1,10 +1,59 @@
+@cart-width: 300px;
+
 .pizza-card {
+    text-align: left;
   img {
     max-width: 250px;
   }
 
   h3 {
     color: @mainColor;
-    background-color: lighten(@mainColor, 45%);
+      text-align: center;
   }
+    
+   min-width: 150px; 
+    
+    .btn {
+        margin-top:10px;
+    }
+    .row {
+        text-align: center;
+    }
+    
+    .price {
+        font-weight: bold;
+        color: black;
+        margin: 0;
+        margin-top: 20px;
+    }
+    
+    .pizza-type {
+        color: darkgrey;
+    }
 }
+
+.container {
+    text-align: center;
+    margin-top: 100px;
+    padding-right: @cart-width;
+    
+    a {
+        display: inline-block;
+        padding: 10px;
+    }
+    
+    h2 { 
+      display: inline-block;
+    }
+    
+    .quantity {
+        margin-left: 5px;
+    }
+}
+
+
+img {
+    width: 100%;
+}
+
+
