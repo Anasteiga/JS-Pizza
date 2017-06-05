@@ -55,11 +55,22 @@ h1, h2, h3, h4, h5, h6, a {
     font-size: 16px;
 }
 
-a:hover, a.active {
+a.active, a.active:hover {
     color: white;
     background-color: @mainColor;
+    border-radius: 7px;
+    text-decoration: none;
+}
+
+a:hover {
+    background-color: #ececec;
+    color: @mainColor;
     text-decoration: none;
     border-radius: 7px;
+}
+
+a {
+    cursor: pointer;
 }
 
 #main-footer {

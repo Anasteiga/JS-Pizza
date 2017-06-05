@@ -2,6 +2,7 @@
  * Created by chaika on 02.02.16.
  */
 var Templates = require('../Templates');
+var Storage = require('../storage/Storage');
 
 //Перелік розмірів піци
 var PizzaSize = {
@@ -13,34 +14,41 @@ var PizzaSize = {
 var Cart = [];
 
 //HTML едемент куди будуть додаватися піци
-var $cart = $("#cart");
+var $cart = $("#cart-items");
 
 function addToCart(pizza, size) {
-    //Додавання однієї піци в кошик покупок
 
-    //Приклад реалізації, можна робити будь-яким іншим способом
-    Cart.push({
+    function findElement (e) {
+        var index = -1;
+        Cart.forEach(function(element) {
+            if (e.pizza.id==element.pizza.id && e.size==element.size)
+                index = Cart.indexOf(element);
+        });
+        return index;
+    }
+    
+    var newItem = {
         pizza: pizza,
         size: size,
         quantity: 1
-    });
-
-    //Оновити вміст кошика на сторінці
+        };
+    var index = findElement(newItem);
+    if (index==-1) {
+        Cart.push(newItem);
+    } else {
+        Cart[index].quantity++;
+    }
+    
     updateCart();
 }
 
 function removeFromCart(cart_item) {
-    //Видалити піцу з кошика
-    //TODO: треба зробити
-
-    //Після видалення оновити відображення
+    Cart.splice(Cart.indexOf(cart_item), 1);
     updateCart();
 }
 
 function initialiseCart() {
-    //Фукнція віпрацьвуватиме при завантаженні сторінки
-    //Тут можна наприклад, зчитати вміст корзини який збережено в Local Storage то показати його
-    //TODO: ...
+    Cart = Storage.get("cart") || Cart;
 
     updateCart();
 }
@@ -53,10 +61,26 @@ function getPizzaInCart() {
 function updateCart() {
     //Функція викликається при зміні вмісту кошика
     //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміт кошика в Local Storage
+    Storage.set("cart", Cart);
 
     //Очищаємо старі піци в кошику
     $cart.html("");
+    if (Cart.length==0) {
+        $cart.html('<h4 id="empty-label">Пусто в холодильнику?<br />Замовте піцу!</h4>');
+    }
+    
+    $("#cart-list-quantity").html(Cart.length);
 
+    function totalPrice () {
+        var price = 0;
+        Cart.forEach(function(element) {
+            price += element.pizza[element.size].price*element.quantity;
+        });
+        return price;
+    }
+    
+    $("#total").html(totalPrice() + " грн.");
+    
     //Онволення однієї піци
     function showOnePizzaInCart(cart_item) {
         var html_code = Templates.PizzaCart_OneItem(cart_item);
@@ -64,10 +88,19 @@ function updateCart() {
         var $node = $(html_code);
 
         $node.find(".plus").click(function(){
-            //Збільшуємо кількість замовлених піц
-            cart_item.quantity += 1;
-
-            //Оновлюємо відображення
+            cart_item.quantity ++;
+            updateCart();
+        });
+        $node.find(".minus").click(function(){
+            if (cart_item.quantity > 1) {
+                cart_item.quantity --;
+            } else {
+                removeFromCart(cart_item);
+            }
+            updateCart();
+        });
+        $node.find(".remove").click(function(){
+            removeFromCart (cart_item);
             updateCart();
         });
 
@@ -77,6 +110,11 @@ function updateCart() {
     Cart.forEach(showOnePizzaInCart);
 
 }
+
+$("#clear").click(function(){
+    Cart = [];
+    updateCart();
+});
 
 exports.removeFromCart = removeFromCart;
 exports.addToCart = addToCart;

@@ -9,6 +9,8 @@ var Pizza_List = require('../Pizza_List');
 var $pizza_list = $("#pizza_list");
 
 function showPizzaList(list) {
+    $("#pizza-list-quantity").html(list.length);
+    
     //Очищаємо старі піци в кошику
     $pizza_list.html("");
 
@@ -35,12 +37,31 @@ function filterPizza(filter) {
     //Масив куди потраплять піци які треба показати
     var pizza_shown = [];
 
-    Pizza_List.forEach(function(pizza){
-        //Якщо піка відповідає фільтру
-        //pizza_shown.push(pizza);
-
-        //TODO: зробити фільтри
-    });
+    function _filter (content, filter) {
+        var res;
+        if (filter=="vega")
+            res = true;
+        Object.keys(content).forEach(function(key){
+            if (filter=="vega") {
+                if (key=="meat" || key=="ocean" || key=="chicken") {
+                    return res = false;
+                }
+            } else if (key==filter) {
+                res = true;
+                return false;
+            }
+        });
+        return res;
+    }
+    
+    if (filter=="all") {
+        pizza_shown = Pizza_List;
+    } else {
+        Pizza_List.forEach(function(pizza){
+            if (_filter(pizza.content, filter))
+                pizza_shown.push(pizza);
+        });
+    }
 
     //Показати відфільтровані піци
     showPizzaList(pizza_shown);
@@ -48,7 +69,22 @@ function filterPizza(filter) {
 
 function initialiseMenu() {
     //Показуємо усі піци
-    showPizzaList(Pizza_List)
+    showPizzaList(Pizza_List);
+    
+    var filters = $("#filters");
+    var a = filters.find("a");
+    filters.find("a").each(function() {
+        var element = $(this);
+        element.click(function(e){
+            e.preventDefault();
+            filters.find("a").each(function() {
+                $(this).removeClass("active");
+            });
+            element.addClass("active");
+            filterPizza(element.attr("href"));
+            $("#pizza-types").html(element.attr("title"));
+        });
+    });
 }
 
 exports.filterPizza = filterPizza;
