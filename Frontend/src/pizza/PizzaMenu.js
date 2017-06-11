@@ -3,12 +3,14 @@
  */
 var Templates = require('../Templates');
 var PizzaCart = require('./PizzaCart');
-var Pizza_List = require('../Pizza_List');
+var Pizza_List;
+var API = require('../API');
 
 //HTML едемент куди будуть додаватися піци
 var $pizza_list = $("#pizza_list");
 
 function showPizzaList(list) {
+    
     $("#pizza-list-quantity").html(list.length);
     
     //Очищаємо старі піци в кошику
@@ -68,22 +70,25 @@ function filterPizza(filter) {
 }
 
 function initialiseMenu() {
-    //Показуємо усі піци
-    showPizzaList(Pizza_List);
+    API.getPizzaList(function(err, data) {
+        Pizza_List = data;
+        //Показуємо усі піци
+        showPizzaList(Pizza_List);
     
-    var filters = $("#filters");
-    var a = filters.find("a");
-    filters.find("a").each(function() {
-        var element = $(this);
-        element.click(function(e){
-            e.preventDefault();
-            filters.find("a").each(function() {
-                $(this).removeClass("active");
+        var filters = $("#filters");
+        var a = filters.find("a");
+        filters.find("a").each(function() {
+            var element = $(this);
+            element.click(function(e){
+                e.preventDefault();
+                filters.find("a").each(function() {
+                    $(this).removeClass("active");
+                });
+                element.addClass("active");
+                filterPizza(element.attr("href"));
+                $("#pizza-types").html(element.attr("title"));
             });
-            element.addClass("active");
-            filterPizza(element.attr("href"));
-            $("#pizza-types").html(element.attr("title"));
-        });
+        }); 
     });
 }
 

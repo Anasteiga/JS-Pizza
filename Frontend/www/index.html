@@ -80,13 +80,25 @@
     
 <div id="discount">ЦЬОГО ТИЖНЯ НА ВСЕ<br /><p>-20%</p><img src="assets/images/discount.svg" /></div>
     
-<!-- jQuery JavaScript -->
-<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
+<!--
+<div id="googleMap"></div>
+    
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC-bqqI15Vj3zVmZ1b51oWWnD5QG-KKhTI"> </script>
+<script>  
+function initialize(){
+    var mapProp = {
+        center:new google.maps.LatLng(50.464379,30.519131),
+        zoom:11
+    };
+    var html_element = document.getElementById("googleMap");
+    var map = new google.maps.Map(html_element,mapProp);
+}
 
-<!--Bootsrap JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+-->   
 
 <!--Own JavaScript -->
-<!--<script type="text/javascript"  src="assets/js/main.js"> </script>-->
+<script type="text/javascript"  src="assets/js/main.js"> </script>
 </body>
 </html>

@@ -1,0 +1,17 @@
+<% include common/header.ejs %>
+
+<div class="container">
+    <h2 id="pizza-types">Усі піци </h2> <span id="pizza-list-quantity" class="quantity">3</span>
+    <div id="filters" class="row">
+        <h3> <a href="all" class="active" title="Усі піци">Усі</a> <a href="meat" title="М'ясні піци">М'ясні</a> <a href="pineapple" title="Піци з ананасами">З ананасами</a> <a href="mushroom" title="Піци з грибами">З грибами</a> <a href="ocean" title="ПІци з морепродуктами">З морепродуктами</a> <a href="vega" title="Вегетаріанські піци">Вега</a> </h3>
+    </div>
+    
+    <div class="row" id="pizza_list">
+    </div>
+    
+    <% include common/header_elements.ejs %>
+    <% include common/footer_elements.ejs %>
+</div>
+
+<% include common/cart.ejs %>
+<% include common/footer.ejs %>
