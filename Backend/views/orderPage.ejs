@@ -6,39 +6,129 @@
         <form class="col-sm-6" id="buyform">
             <div class="row form-group">
                 <label for="name" class="col-sm-3 control-label">Ім'я</label>
-                <div class="col-sm-9"><input class="form-control" name="name" type="text" placeholder="Вася Сонях"/></div>
+                <div class="col-sm-9"><input class="form-control" name="name" id="userName" type="text" placeholder="Вася Сонях"/></div>
             </div>
             <div class="row form-group">
                 <label for="phone" class="col-sm-3 control-label">Телефон</label>
-                <div class="col-sm-9"><input class="form-control" name="phone" type="text" placeholder="+380931234567"/></div>
+                <div class="col-sm-9"><input class="form-control" name="phone" id="userPhone" type="text" placeholder="+380931234567"/></div>
             </div>
             <div class="row form-group">
                 <label for="address" class="col-sm-3 control-label">Адреса</label>
-                <div class="col-sm-9"><input class="form-control" name="address" type="text" placeholder="Київ, вул. Спаська , 2"/></div>
+                <div class="col-sm-9"><input class="form-control" id="userAddress" name="address" type="text" placeholder="Київ, вул. Спаська , 2"/></div>
             </div>
         </form>
         <div class="col-sm-6" id="callout-container">
             <div class="bs-callout bs-callout-warning">     
                 <h4>Інформація про замовлення</h4>
-                <p>
-                    <b>Приблизний час доставки:</b> невідомий<br/>
-                    <b>Адреса доставки:</b> невідома
-                </p>
+                <div>
+                    <b>Приблизний час доставки:</b> <span id="approxTime">невідомий</span><br/>
+                    <b>Адреса доставки:</b> <span id="deliveryPlace">невідома</span>
+                </div>
             </div>
             <button id="submit" type="submit" class="btn btn-sm btn-warning">Далі <i class="glyphicon glyphicon-chevron-right icon-white">
                                 </i></button>
         </div>
-        
+        <script	src="//static.liqpay.com/libjs/checkout.js"></script>
         <div id="googleMap"></div>
         <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC-bqqI15Vj3zVmZ1b51oWWnD5QG-KKhTI"> </script>
         <script>  
             function initialize(){
                 var mapProp = {
-                    center:new google.maps.LatLng(50.464379,30.519131),
-                    zoom:11
+                    center: new google.maps.LatLng(50.464379, 30.519131),
+                    zoom: 11
                 };
+                // so as not to display standart markers between locations
+                var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
                 var html_element = document.getElementById("googleMap");
                 var map = new google.maps.Map(html_element,mapProp);
+                var point = new google.maps.LatLng(50.464379, 30.519131);
+                var marker = new google.maps.Marker({
+                    position: point,
+                    map: map,
+                    icon: "/assets/images/map-icon.png"
+                });
+                directionsDisplay.setMap(map);
+                marker.setMap(map);
+                google.maps.event.addListener(map, 'click', function (me) {
+                    var coordinates = me.latLng;
+                    marker.setMap(map);
+                });
+
+                function geocodeLatLng(latlng, callback) {
+                    var geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({'location': latlng},
+                        function (results, status) {
+                            if (status === google.maps.GeocoderStatus.OK && results[1]) {
+                                var adress = results[1].formatted_address;
+                                callback(null, adress);
+                            }
+                            else {
+                                callback(new Error("Can't	find	adress"));
+                            }
+                        });
+                }
+                function calculateRoute(A_latlng,	B_latlng,	callback) {
+                    var directionService =	new	google.maps.DirectionsService();
+                    directionService.route({
+                            origin:	A_latlng,
+                            destination:	B_latlng,
+                            travelMode:	google.maps.TravelMode["DRIVING"] },
+                        function(response,	status)
+                        {
+                            if	(
+                                status	==	google.maps.DirectionsStatus.OK )	{
+                                directionsDisplay.setDirections(response);
+                                //directionsDisplay.setDirections(response);
+                                var leg	=	response.routes[0].legs[0];
+                                callback(null,	{
+                                    duration:	leg.duration
+                                }); }
+                            else { 
+                                callback(new	Error("Cannot	find direction")); 
+                            } 
+                        });
+                }
+                var markers = [];
+                function removeMarkers(){
+                    for (var i = 0; i < markers.length; i++) {
+                        markers[i].setMap(null);
+                    }
+                }
+                //remove references on markers
+                function deleteMarkers() {
+                    removeMarkers();
+                    markers = [];
+                }
+                google.maps.event.addListener(map, 'click', function (me) {
+                    var coordinates = me.latLng;
+                    removeMarkers();
+                    geocodeLatLng(coordinates, function (err, adress) {
+                        if (!err) {
+                            console.log(adress);
+                            $("#userAddress").val(adress);
+                            $("#deliveryPlace").html(adress);
+                            var point1 = coordinates;
+                            var marker1 = new google.maps.Marker({
+                                position: point1,
+                                map: map,
+                                icon: "/assets/images/home-icon.png"
+                            });
+                            markers.push(marker1);
+                        } else {
+                            console.log("Немає адреси")
+                        }
+                    });
+
+                    calculateRoute(coordinates, point, function (err, time){
+                        if (!err) {
+                            console.log(time);
+                            $("#approxTime").html(time.duration.text);
+                        }
+                        else {
+                            console.log("Неможливо порахувати")
+                        }
+                    });
+                });
             }
 
             google.maps.event.addDomListener(window, 'load', initialize);

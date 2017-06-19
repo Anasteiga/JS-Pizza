@@ -58,6 +58,14 @@ function getPizzaInCart() {
     return Cart;
 }
 
+function totalPrice () {
+    var price = 0;
+    Cart.forEach(function(element) {
+        price += element.pizza[element.size].price*element.quantity;
+    });
+    return price;
+}
+
 function updateCart() {
     //Функція викликається при зміні вмісту кошика
     //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміт кошика в Local Storage
@@ -70,14 +78,6 @@ function updateCart() {
     }
     
     $("#cart-list-quantity").html(Cart.length);
-
-    function totalPrice () {
-        var price = 0;
-        Cart.forEach(function(element) {
-            price += element.pizza[element.size].price*element.quantity;
-        });
-        return price;
-    }
     
     $("#total").html(totalPrice() + " грн.");
     
@@ -121,5 +121,6 @@ exports.addToCart = addToCart;
 
 exports.getPizzaInCart = getPizzaInCart;
 exports.initialiseCart = initialiseCart;
+exports.totalPrice = totalPrice;
 
 exports.PizzaSize = PizzaSize;

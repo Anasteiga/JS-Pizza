@@ -7,6 +7,7 @@ $(function(){
     var PizzaMenu = require('./pizza/PizzaMenu');
     var PizzaCart = require('./pizza/PizzaCart');
     var Pizza_List = require('./Pizza_List');
+    var API = require('./API');
 
     PizzaCart.initialiseCart();
     PizzaMenu.initialiseMenu();
@@ -22,7 +23,39 @@ $(function(){
         }, "");
     
     $("#submit").click(function() {
-        $("#buyform").valid();    
+        $("#buyform").validate();      
+        if ($("#buyform").valid()) {
+            var name = $("#userName").val();
+            var phone = $("#userPhone").val();
+            var address = $("#userAddress").val();
+            var orderData = {
+                cart: PizzaCart.Cart,
+                name: name,
+                phone: phone,
+                address: address,
+                sum: PizzaCart.totalPrice()
+            };
+            API.createOrder(orderData, function(err, data) {
+                if (err) {
+                    console.log("Error");
+                } else {
+                    LiqPayCheckout.init({
+                        data: data.data,
+                        signature: data.signature,
+                        embedTo: "#liqpay",
+                        mode: "popup"
+                    }).on("liqpay.callback",
+                        function(data) {
+                            console.log(data.status);
+                            console.log(data);
+                        }).on("liqpay.ready", function(data) {}).on("liqpay.close", function(data) {
+
+                    });
+                    console.log("Success");
+                }
+            });
+
+        }
     });
     
     $("#buyform").validate({

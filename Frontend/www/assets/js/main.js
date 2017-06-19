@@ -240,6 +240,7 @@ $(function(){
     var PizzaMenu = require('./pizza/PizzaMenu');
     var PizzaCart = require('./pizza/PizzaCart');
     var Pizza_List = require('./Pizza_List');
+    var API = require('./API');
 
     PizzaCart.initialiseCart();
     PizzaMenu.initialiseMenu();
@@ -255,7 +256,39 @@ $(function(){
         }, "");
     
     $("#submit").click(function() {
-        $("#buyform").valid();    
+        $("#buyform").validate();      
+        if ($("#buyform").valid()) {
+            var name = $("#userName").val();
+            var phone = $("#userPhone").val();
+            var address = $("#userAddress").val();
+            var orderData = {
+                cart: PizzaCart.Cart,
+                name: name,
+                phone: phone,
+                address: address,
+                sum: PizzaCart.totalPrice()
+            };
+            API.createOrder(orderData, function(err, data) {
+                if (err) {
+                    console.log("Error");
+                } else {
+                    LiqPayCheckout.init({
+                        data: data.data,
+                        signature: data.signature,
+                        embedTo: "#liqpay",
+                        mode: "popup"
+                    }).on("liqpay.callback",
+                        function(data) {
+                            console.log(data.status);
+                            console.log(data);
+                        }).on("liqpay.ready", function(data) {}).on("liqpay.close", function(data) {
+
+                    });
+                    console.log("Success");
+                }
+            });
+
+        }
     });
     
     $("#buyform").validate({
@@ -290,7 +323,7 @@ $(function(){
     });
 
 });
-},{"./Pizza_List":2,"./pizza/PizzaCart":5,"./pizza/PizzaMenu":6}],5:[function(require,module,exports){
+},{"./API":1,"./Pizza_List":2,"./pizza/PizzaCart":5,"./pizza/PizzaMenu":6}],5:[function(require,module,exports){
 /**
  * Created by chaika on 02.02.16.
  */
@@ -351,6 +384,14 @@ function getPizzaInCart() {
     return Cart;
 }
 
+function totalPrice () {
+    var price = 0;
+    Cart.forEach(function(element) {
+        price += element.pizza[element.size].price*element.quantity;
+    });
+    return price;
+}
+
 function updateCart() {
     //Функція викликається при зміні вмісту кошика
     //Тут можна наприклад показати оновлений кошик на екрані та зберегти вміт кошика в Local Storage
@@ -363,14 +404,6 @@ function updateCart() {
     }
     
     $("#cart-list-quantity").html(Cart.length);
-
-    function totalPrice () {
-        var price = 0;
-        Cart.forEach(function(element) {
-            price += element.pizza[element.size].price*element.quantity;
-        });
-        return price;
-    }
     
     $("#total").html(totalPrice() + " грн.");
     
@@ -414,6 +447,7 @@ exports.addToCart = addToCart;
 
 exports.getPizzaInCart = getPizzaInCart;
 exports.initialiseCart = initialiseCart;
+exports.totalPrice = totalPrice;
 
 exports.PizzaSize = PizzaSize;
 },{"../Templates":3,"../storage/Storage":7}],6:[function(require,module,exports){
